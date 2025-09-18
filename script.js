@@ -223,7 +223,7 @@ function launchConfetti() {
   confettiCanvas.height = window.innerHeight;
 
   let confettiPieces = [];
-  for (let i = 0; i < 50; i++) {
+  for (let i = 0; i < 50; i++) {  // fewer pieces
     confettiPieces.push({
       x: Math.random() * confettiCanvas.width,
       y: Math.random() * confettiCanvas.height - confettiCanvas.height,
@@ -232,17 +232,38 @@ function launchConfetti() {
       color: `hsl(${Math.random()*360},100%,60%)`
     });
   }
+
+  let opacity = 1; // start fully visible
+  let animationFrame;
+
   function drawConfetti() {
     ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+    ctx.globalAlpha = opacity;
+
     confettiPieces.forEach(p => {
       ctx.fillStyle = p.color;
       ctx.fillRect(p.x, p.y, p.r, p.r);
       p.y += p.d;
       if (p.y > confettiCanvas.height) p.y = -10;
     });
-    requestAnimationFrame(drawConfetti);
+
+    ctx.globalAlpha = 1; // reset for other drawings
+    animationFrame = requestAnimationFrame(drawConfetti);
   }
+
   drawConfetti();
+
+  // Fade out after 3 seconds
+  setTimeout(() => {
+    const fadeInterval = setInterval(() => {
+      opacity -= 0.05;
+      if (opacity <= 0) {
+        clearInterval(fadeInterval);
+        cancelAnimationFrame(animationFrame);
+        ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+      }
+    }, 100);
+  }, 3000);
 }
 
 // 💕 Cursor hearts
