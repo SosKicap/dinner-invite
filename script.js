@@ -6,10 +6,13 @@ function openEnvelope() {
   music.volume = 0.3;
   music.play();
 
+  // Open flap and slide letter
   envelope.classList.add('open');
+
+  // After animation, go to Page 2
   setTimeout(() => {
     goToPage(2);
-  }, 1500); // wait for animation
+  }, 2500); // wait for flap + letter animation
 }
 
 function goToPage(pageNum) {
