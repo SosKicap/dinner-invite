@@ -223,7 +223,7 @@ function launchConfetti() {
   confettiCanvas.height = window.innerHeight;
 
   let confettiPieces = [];
-  for (let i = 0; i < 150; i++) {
+  for (let i = 0; i < 50; i++) {
     confettiPieces.push({
       x: Math.random() * confettiCanvas.width,
       y: Math.random() * confettiCanvas.height - confettiCanvas.height,
