@@ -12,7 +12,7 @@ function openEnvelope() {
   // After animation, go to Page 2
   setTimeout(() => {
     goToPage(2);
-  }, 2500); // wait for flap + letter animation
+  }, 3000); // wait for flap + letter
 }
 
 function goToPage(pageNum) {
@@ -21,7 +21,7 @@ function goToPage(pageNum) {
 }
 
 function moveNoButton(btn) {
-  const x = Math.random() * 200 - 100;
-  const y = Math.random() * 200 - 100;
+  const x = Math.random() * 500 - 250; // move further horizontally
+  const y = Math.random() * 300 - 150; // move further vertically
   btn.style.transform = `translate(${x}px, ${y}px)`;
 }

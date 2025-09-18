@@ -26,14 +26,13 @@ body, html {
   width: 280px;
   height: 180px;
   background: #fff;
-  cursor: pointer;
-  perspective: 1000px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
   border: 2px solid #d6336c;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  cursor: pointer;
   overflow: hidden;
 }
 
-/* Flap (top triangle) */
+/* Flap */
 .flap {
   position: absolute;
   top: 0;
@@ -52,7 +51,7 @@ body, html {
   transform: rotateX(-180deg);
 }
 
-/* Envelope bottom triangle */
+/* Bottom part */
 .envelope::after {
   content: "";
   position: absolute;
@@ -81,15 +80,16 @@ body, html {
   align-items: center;
   text-align: center;
   font-weight: bold;
-  font-size: 1.1em;
+  font-size: 1.2em;
   padding: 10px;
   box-sizing: border-box;
-  transition: top 1.5s ease;
-  z-index: 1;
+  transition: top 2s ease;
+  opacity: 0;
 }
 
 .envelope.open .letter {
-  top: 10%;
+  top: 5%;
+  opacity: 1;
 }
 
 /* Click text */
@@ -99,14 +99,15 @@ body, html {
   color: #5c2d91;
 }
 
-/* Invitation Card */
+/* Invitation Card & Details Card */
 .card {
   text-align: center;
-  background: rgba(255,255,255,0.9);
-  padding: 30px;
+  background: #fff;
+  padding: 40px;
   border-radius: 20px;
-  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
   animation: fadeIn 1.5s ease-in;
+  max-width: 400px;
 }
 
 .card h1 {
@@ -123,8 +124,9 @@ body, html {
   margin-top: 20px;
 }
 
+/* Buttons */
 .yes-btn, .no-btn, .btn {
-  padding: 12px 24px;
+  padding: 12px 28px;
   margin: 10px;
   border: none;
   border-radius: 30px;
