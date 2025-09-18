@@ -83,7 +83,7 @@ body, html {
   font-size: 1.2em;
   padding: 10px;
   box-sizing: border-box;
-  transition: top 2s ease;
+  transition: top 2s ease, opacity 2s ease;
   opacity: 0;
 }
 
@@ -138,6 +138,7 @@ body, html {
 .yes-btn {
   background: #d6336c;
   color: white;
+  animation: pulse 1.5s infinite;
 }
 
 .btn {
@@ -149,6 +150,13 @@ body, html {
 
 .yes-btn:hover, .btn:hover {
   transform: scale(1.1);
+}
+
+/* Pulse animation for Yes button */
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(214, 51, 108, 0.7); }
+  70% { box-shadow: 0 0 0 15px rgba(214, 51, 108, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(214, 51, 108, 0); }
 }
 
 /* Floating Hearts */

@@ -21,7 +21,7 @@ function goToPage(pageNum) {
 }
 
 function moveNoButton(btn) {
-  const x = Math.random() * 500 - 250; // move further horizontally
-  const y = Math.random() * 300 - 150; // move further vertically
+  const x = Math.random() * 600 - 300; // move further horizontally
+  const y = Math.random() * 400 - 200; // move further vertically
   btn.style.transform = `translate(${x}px, ${y}px)`;
 }
