@@ -1,0 +1,147 @@
+/* General Page Setup */
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #ffdde1, #ee9ca7);
+  overflow: hidden;
+}
+
+.page {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.hidden {
+  display: none;
+}
+
+/* Envelope */
+.envelope {
+  position: relative;
+  width: 250px;
+  height: 180px;
+  background: #fff;
+  border: 2px solid #d6336c;
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  transform-style: preserve-3d;
+}
+
+.flap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #d6336c;
+  transform-origin: top;
+  transform: rotateX(0deg);
+  transition: transform 1s ease;
+  z-index: 2;
+}
+
+.envelope.open .flap {
+  transform: rotateX(-180deg);
+}
+
+.letter {
+  position: absolute;
+  bottom: -100%;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: bottom 1s ease;
+}
+
+.envelope.open .letter {
+  bottom: 0;
+}
+
+.click-text {
+  margin-top: 20px;
+  font-size: 1.2em;
+  color: #5c2d91;
+}
+
+/* Invitation Card */
+.card {
+  text-align: center;
+  background: rgba(255,255,255,0.9);
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+  animation: fadeIn 1.5s ease-in;
+}
+
+.card h1 {
+  font-size: 2em;
+  color: #d6336c;
+}
+
+.card p {
+  font-size: 1.2em;
+  margin: 10px 0;
+}
+
+.buttons {
+  margin-top: 20px;
+}
+
+.yes-btn, .no-btn, .btn {
+  padding: 12px 24px;
+  margin: 10px;
+  border: none;
+  border-radius: 30px;
+  font-size: 1.1em;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.yes-btn {
+  background: #d6336c;
+  color: white;
+}
+
+.btn {
+  background: #5c2d91;
+  color: white;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.yes-btn:hover, .btn:hover {
+  transform: scale(1.1);
+}
+
+/* Floating Hearts */
+.hearts span {
+  position: absolute;
+  bottom: -50px;
+  font-size: 2em;
+  animation: float 6s infinite;
+}
+
+.hearts span:nth-child(1) { left: 20%; animation-delay: 0s; }
+.hearts span:nth-child(2) { left: 40%; animation-delay: 2s; }
+.hearts span:nth-child(3) { left: 60%; animation-delay: 4s; }
+.hearts span:nth-child(4) { left: 80%; animation-delay: 1s; }
+
+@keyframes float {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(-110vh); opacity: 0; }
+}
+
+/* Fade-in Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}

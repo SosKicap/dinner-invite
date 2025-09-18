@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Birthday Dinner Invitation ❤️</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Page 1: Envelope -->
+  <div class="page" id="page1">
+    <div class="envelope" onclick="openEnvelope()">
+      <div class="flap"></div>
+      <div class="letter">
+        <p>Invitation for Birthday Dinner</p>
+      </div>
+    </div>
+    <p class="click-text">Click the ✉ to open</p>
+  </div>
+
+  <!-- Page 2: Invitation -->
+  <div class="page hidden" id="page2">
+    <div class="card">
+      <h1>Dear Noor Aisyah ❤️</h1>
+      <p>Would you join me for a special birthday dinner?</p>
+      <div class="buttons">
+        <button class="yes-btn" onclick="goToPage(3)">Yes ❤️</button>
+        <button class="no-btn" onmouseover="moveNoButton(this)">No 😢</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page 3: Dinner Details -->
+  <div class="page hidden" id="page3">
+    <div class="card">
+      <h1>Birthday Dinner Details 🎂✨</h1>
+      <p><strong>Date:</strong> Saturday, 21st September</p>
+      <p><strong>Time:</strong> 7:30 PM</p>
+      <p><strong>Place:</strong> Le Romantic Restaurant</p>
+      <a href="https://maps.google.com/?q=Le+Romantic+Restaurant" target="_blank" class="btn">View on Google Maps 📍</a>
+    </div>
+
+    <!-- Floating hearts -->
+    <div class="hearts">
+      <span>🤍</span>
+      <span>❤️</span>
+      <span>🤍</span>
+      <span>❤️</span>
+    </div>
+  </div>
+
+  <!-- Background Music -->
+  <audio id="bgMusic" loop>
+    <source src="romantic.mp3" type="audio/mpeg">
+  </audio>
+
+  <script src="script.js"></script>
+</body>
+</html>
