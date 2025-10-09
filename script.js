@@ -34,6 +34,15 @@ function goToPage(pageNum) {
   const next = document.getElementById('page' + pageNum);
   next.classList.remove('hidden');
 
+  // ✅ Lock/unlock scroll based on page
+  if (pageNum === 3) {
+    document.body.style.overflow = "auto";   // allow scroll
+    document.documentElement.style.overflow = "auto";
+  } else {
+    document.body.style.overflow = "hidden"; // lock scroll
+    document.documentElement.style.overflow = "hidden";
+  }
+
   if (pageNum === 3) {
     const card = next.querySelector('.card');
     card.classList.remove("fade-in");
@@ -42,12 +51,41 @@ function goToPage(pageNum) {
   }
 }
 
+let noButtonEscapeCount = 0;  // track how many times No button escaped
+
 function moveNoButton(btn) {
-  const maxX = window.innerWidth / 3;
-  const maxY = window.innerHeight / 4;
-  const x = Math.random() * maxX - maxX / 2;
-  const y = Math.random() * maxY - maxY / 2;
+  noButtonEscapeCount++;
+
+  const card = btn.closest(".card");
+  const cardRect = card.getBoundingClientRect();
+  const btnRect = btn.getBoundingClientRect();
+
+  // 🔹 Detect if we’re on mobile
+  const isMobile = window.innerWidth <= 600;
+
+  let x, y;
+  if (isMobile) {
+    const offsetX = (Math.random() * 60 - 30);
+    const offsetY = (Math.random() * 40);
+    x = offsetX;
+    y = offsetY;
+  } else {
+    const maxX = cardRect.width - btnRect.width - 20;
+    const maxY = cardRect.height - btnRect.height - 20;
+    x = Math.random() * maxX - maxX / 2;
+    y = Math.random() * maxY - maxY / 2;
+  }
+
   btn.style.transform = `translate(${x}px, ${y}px)`;
+
+  btn.classList.add("shake");
+  setTimeout(() => btn.classList.remove("shake"), 300);
+
+  if (noButtonEscapeCount >= 4) {
+    btn.style.transition = "opacity 0.6s ease";
+    btn.style.opacity = "0";
+    setTimeout(() => btn.remove(), 600);
+  }
 }
 
 function yesClicked(btn) {
@@ -77,13 +115,15 @@ function spawnIcon(x = null, y = null) {
   const container = document.getElementById("popIcons");
   const icon = document.createElement("span");
   icon.textContent = icons[Math.floor(Math.random() * icons.length)];
+
+  icon.style.position = "fixed";
   if (x === null || y === null) {
     x = Math.random() * window.innerWidth;
     y = Math.random() * window.innerHeight;
   }
   icon.style.left = `${x}px`;
   icon.style.top = `${y}px`;
-  icon.style.position = "absolute";
+
   icon.style.fontSize = "2em";
   icon.style.animation = "popFloat 2s ease forwards, spin 2s linear";
   container.appendChild(icon);
@@ -199,12 +239,14 @@ function spawnArrow() {
   }
   requestAnimationFrame(animate);
 }
+
 function createArrowBurst(x, y) {
   const container = document.getElementById("arrowContainer");
   for (let i = 0; i < 6; i++) {
     const heart = document.createElement("span");
     heart.textContent = ["💖","💕","✨","🌟"][Math.floor(Math.random()*4)];
     heart.classList.add("arrow-burst");
+    heart.style.position = "fixed";
     heart.style.left = `${x}px`;
     heart.style.top = `${y}px`;
     heart.style.setProperty("--x", (Math.random()*120 - 60) + "px");
@@ -213,6 +255,7 @@ function createArrowBurst(x, y) {
     setTimeout(() => heart.remove(), 1000);
   }
 }
+
 setInterval(spawnArrow, 600);
 
 // 🎉 Confetti
@@ -223,7 +266,7 @@ function launchConfetti() {
   confettiCanvas.height = window.innerHeight;
 
   let confettiPieces = [];
-  for (let i = 0; i < 50; i++) {  // fewer pieces
+  for (let i = 0; i < 50; i++) {
     confettiPieces.push({
       x: Math.random() * confettiCanvas.width,
       y: Math.random() * confettiCanvas.height - confettiCanvas.height,
@@ -233,7 +276,7 @@ function launchConfetti() {
     });
   }
 
-  let opacity = 1; // start fully visible
+  let opacity = 1;
   let animationFrame;
 
   function drawConfetti() {
@@ -247,13 +290,12 @@ function launchConfetti() {
       if (p.y > confettiCanvas.height) p.y = -10;
     });
 
-    ctx.globalAlpha = 1; // reset for other drawings
+    ctx.globalAlpha = 1;
     animationFrame = requestAnimationFrame(drawConfetti);
   }
 
   drawConfetti();
 
-  // Fade out after 3 seconds
   setTimeout(() => {
     const fadeInterval = setInterval(() => {
       opacity -= 0.05;
@@ -271,8 +313,115 @@ document.addEventListener("mousemove", e => {
   const container = document.getElementById("cursorHearts");
   const heart = document.createElement("span");
   heart.textContent = "💖";
-  heart.style.left = e.pageX + "px";
-  heart.style.top = e.pageY + "px";
+  heart.style.position = "fixed";
+  heart.style.left = e.clientX + "px";
+  heart.style.top = e.clientY + "px";
   container.appendChild(heart);
   setTimeout(() => heart.remove(), 1000);
 });
+
+// Track scroll direction
+let lastScrollY = window.scrollY;
+let scrollDirection = "down";
+
+window.addEventListener("scroll", () => {
+  const currentY = window.scrollY;
+  scrollDirection = currentY > lastScrollY ? "down" : "up";
+  lastScrollY = currentY;
+});
+
+// 🎬 Scroll reveal for Page 3 sections
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      entry.target.classList.remove('exit');
+
+      // Animate children one by one
+      const children = entry.target.querySelectorAll(':scope > *');
+      children.forEach((child, i) => {
+        child.style.transitionDelay = `${i * 150}ms`;
+      
+        // Start offset depending on scroll direction
+        if (scrollDirection === "down") {
+          child.style.transform = "translateY(20px)";
+        } else {
+          child.style.transform = "translateY(-20px)";
+        }
+      
+        requestAnimationFrame(() => {
+          child.style.opacity = "1";
+          child.style.transform = "translateY(0)";
+        });
+      });
+    
+      // Special case: activities list
+      if (entry.target.classList.contains('activities')) {
+        const items = entry.target.querySelectorAll('li');
+        items.forEach((item, i) => {
+          setTimeout(() => item.classList.add('visible'), i * 200);
+        });
+      }
+    
+    } else {
+      entry.target.classList.remove('visible');
+      entry.target.classList.add('exit');
+    
+      const children = entry.target.querySelectorAll(':scope > *');
+      children.forEach(child => {
+        child.style.transitionDelay = "0ms";
+        child.style.opacity = "0";
+      
+        // Exit direction opposite of scroll
+        if (scrollDirection === "down") {
+          child.style.transform = "translateY(-40px)";
+        } else {
+          child.style.transform = "translateY(40px)";
+        }
+      });
+    
+      if (entry.target.classList.contains('activities')) {
+        const items = entry.target.querySelectorAll('li');
+        items.forEach(item => item.classList.remove('visible'));
+      }
+    }
+  });
+}, { threshold: 0.2 });
+
+document.querySelectorAll('#page3 .section').forEach(section => {
+  observer.observe(section);
+});
+
+// 🎇 Random floating emojis around final message
+function spawnFloatingFromHeart() {
+  const heart = document.getElementById("textHeart");
+  if (!heart) return;
+
+  const rect = heart.getBoundingClientRect();
+  const container = document.querySelector(".final-message-container");
+  const containerRect = container.getBoundingClientRect();
+
+  const x = rect.left + rect.width / 2 - containerRect.left;
+  const y = rect.top + rect.height / 2 - containerRect.top;
+
+  const emojis = ["💖","💕","✨","🌟","💝"];
+  const span = document.createElement("span");
+  span.className = "floating";
+  span.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+
+  // place inside container at heart position
+  span.style.left = `${x}px`;
+  span.style.top = `${y}px`;
+
+  // random float offsets
+  const offsetX = (Math.random() * 240 - 120) + "px";
+  const offsetY = (Math.random() * -200 - 100) + "px";
+  span.style.setProperty("--x", offsetX);
+  span.style.setProperty("--y", offsetY);
+
+  container.appendChild(span);
+
+  setTimeout(() => span.remove(), 3000);
+}
+
+setInterval(spawnFloatingFromHeart, 1000);
