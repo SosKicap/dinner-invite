@@ -51,27 +51,21 @@ function goToPage(pageNum) {
   }
 }
 
-let noButtonEscapeCount = 0;  // track how many times No button escaped
-
 function moveNoButton(btn) {
-  noButtonEscapeCount++;
-
   const card = btn.closest(".card");
   const cardRect = card.getBoundingClientRect();
   const btnRect = btn.getBoundingClientRect();
 
-  // 🔹 Detect if we’re on mobile
   const isMobile = window.innerWidth <= 600;
 
   let x, y;
   if (isMobile) {
-    const offsetX = (Math.random() * 60 - 30);
-    const offsetY = (Math.random() * 40);
-    x = offsetX;
-    y = offsetY;
+    x = Math.random() * 160 - 80;
+    y = Math.random() * 120 - 60;
   } else {
-    const maxX = cardRect.width - btnRect.width - 20;
-    const maxY = cardRect.height - btnRect.height - 20;
+    const padding = 20;
+    const maxX = cardRect.width - btnRect.width - padding;
+    const maxY = cardRect.height - btnRect.height - padding;
     x = Math.random() * maxX - maxX / 2;
     y = Math.random() * maxY - maxY / 2;
   }
@@ -80,12 +74,6 @@ function moveNoButton(btn) {
 
   btn.classList.add("shake");
   setTimeout(() => btn.classList.remove("shake"), 300);
-
-  if (noButtonEscapeCount >= 4) {
-    btn.style.transition = "opacity 0.6s ease";
-    btn.style.opacity = "0";
-    setTimeout(() => btn.remove(), 600);
-  }
 }
 
 function yesClicked(btn) {
