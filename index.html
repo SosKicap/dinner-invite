@@ -7,143 +7,142 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Page 1: Envelope -->
-  <div class="page" id="page1">
-    <div class="envelope glow" onclick="openEnvelope()">
-      <div class="flap top"></div>
-      <div class="letter">
-        <p>Invitation for Birthday Dinner</p>
-      </div>
-      <div class="sparkles" id="envelope-sparkles">
-        <span>✨</span><span>💖</span><span>🌟</span><span>💕</span>
-      </div>
-    </div>
-    <div id="arrowContainer"></div>
-  </div>
+  <main>
+    <!-- Page 1: Envelope -->
+    <section class="page" id="page1" aria-label="Invitation envelope">
+      <button class="envelope glow" type="button" onclick="openEnvelope()" aria-label="Open invitation envelope">
+        <span class="flap top"></span>
+        <span class="letter">
+          <span>Invitation for Birthday Dinner</span>
+        </span>
+        <span class="sparkles" id="envelope-sparkles" aria-hidden="true">
+          <span>✨</span><span>💖</span><span>🌟</span><span>💕</span>
+        </span>
+      </button>
+      <div id="arrowContainer" aria-hidden="true"></div>
+    </section>
 
-  <!-- Page 2 -->
-  <div class="page hidden" id="page2">
-    <div class="card glass glow">
-      <h1>Dear My Love, Aisyah 💖</h1>
-      <p>Would you join me for a special birthday dinner?</p>
-      <div class="buttons">
-        <button class="yes-btn" onclick="yesClicked(this)">Yes 💕</button>
-        <button class="no-btn" onmouseover="moveNoButton(this)" onclick="moveNoButton(this)">No 😢</button>
-      </div>
-    </div>
-  </div>
+    <!-- Page 2: Question -->
+    <section class="page hidden" id="page2" aria-label="Dinner invitation question">
+      <div class="card glass glow">
+        <h1>Dear My Love, Aisyah 💖</h1>
+        <p>Would you join me for a special birthday dinner?</p>
 
-  <!-- Page 3 -->
-  <div class="page hidden" id="page3">
-    <div class="card glass glow fade-sequence details-card">
-
-      <!-- 1. Starting Section -->
-      <div class="section start">
-        <h2 class="eyyo">Eyyo, Bebeh 💕</h2>
-        <h1 class="date-with-me">A Date With <span class="me-highlight">ME</span></h1>
-        <p class="save-date">🌟 Save the Date 🌟</p>
-        <p><strong>Day & Date:</strong> Saturday, 18th October</p>
-        <p><strong>Time:</strong> 6:30 PM</p>
-        <p><strong>Location:</strong></p>
-        <div class="map-link">
-          <a href="https://maps.app.goo.gl/JgAeNzF6DxFjgRy8A" target="_blank" class="btn-location">
-            📍 View on Google Maps
-          </a>
-          <div class="map-preview">
-            <iframe 
-              src="https://www.google.com/maps?q=The+Pearl&output=embed" 
-              allowfullscreen=""
-              loading="lazy">
-            </iframe>
-          </div>
+        <div class="buttons">
+          <button class="yes-btn" type="button" onclick="yesClicked(this)">Yes 💕</button>
+          <button class="no-btn" type="button" onmouseover="moveNoButton(this)" onclick="moveNoButton(this)">No 😢</button>
         </div>
       </div>
+    </section>
 
-      <hr>
+    <!-- Page 3: Details -->
+    <section class="page hidden" id="page3" aria-label="Dinner invitation details">
+      <div class="card glass glow fade-sequence details-card">
+        <section class="section start">
+          <h2 class="eyyo">Eyyo, Bebeh 💕</h2>
+          <h1 class="date-with-me">A Date With <span class="me-highlight">ME</span></h1>
+          <p class="save-date">🌟 Save the Date 🌟</p>
+          <p><strong>Day & Date:</strong> Saturday, 18th October</p>
+          <p><strong>Time:</strong> 6:30 PM</p>
+          <p><strong>Location:</strong></p>
 
-      <!-- 2. Dress Code Section -->
-      <div class="section dresscode">
-        <h2>👗 Dress Code</h2>
-        <div class="dress-images">
-          <img src="maroon-man.webp" alt="T-Shirt Maroon">
-          <img src="tudung.png" alt="Tudung">
-          <img src="Seluar.png" alt="Seluar Slack">
-          <img src="abaya.png" alt="Abaya">
-        </div>
+          <div class="map-link">
+            <a href="https://maps.app.goo.gl/JgAeNzF6DxFjgRy8A" target="_blank" rel="noopener noreferrer" class="btn-location">
+              📍 View on Google Maps
+            </a>
+            <div class="map-preview">
+              <iframe
+                title="The Pearl location map"
+                src="https://www.google.com/maps?q=The+Pearl&output=embed"
+                allowfullscreen=""
+                loading="lazy">
+              </iframe>
+            </div>
+          </div>
+        </section>
 
-        <h3>🎨 Theme Colors:</h3>
-        <div class="color-code">
-          <div class="color-item">
-            <span class="color-box" style="background:#ffffff"></span>
-            <p>White</p>
+        <hr>
+
+        <section class="section dresscode">
+          <h2>👗 Dress Code</h2>
+          <div class="dress-images">
+            <img src="maroon-man.webp" alt="Maroon outfit idea">
+            <img src="tudung.png" alt="Tudung outfit idea">
+            <img src="Seluar.png" alt="Slack pants outfit idea">
+            <img src="abaya.png" alt="Abaya outfit idea">
           </div>
-          <div class="color-item">
-            <span class="color-box" style="background:#f5f5dc"></span>
-            <p>Beige</p>
+
+          <h3>🎨 Theme Colors:</h3>
+          <div class="color-code">
+            <div class="color-item">
+              <span class="color-box" style="background:#ffffff"></span>
+              <p>White</p>
+            </div>
+            <div class="color-item">
+              <span class="color-box" style="background:#f5f5dc"></span>
+              <p>Beige</p>
+            </div>
+            <div class="color-item">
+              <span class="color-box" style="background:#c3b091"></span>
+              <p>Khaki</p>
+            </div>
+            <div class="color-item">
+              <span class="color-box" style="background:#800000"></span>
+              <p>Maroon</p>
+            </div>
           </div>
-          <div class="color-item">
-            <span class="color-box" style="background:#c3b091"></span>
-            <p>Khaki</p>
+        </section>
+
+        <hr>
+
+        <section class="section activities">
+          <h2>🎉 What We’ll Do</h2>
+          <ul>
+            <li>🍽 Enjoy unlimited buffet at <strong>The Pearl</strong></li>
+            <li>📸 Take as many pictures as we can for the memories</li>
+            <li>🎮 Play fun games together</li>
+            <li>🎬 Movie Time!!!</li>
+          </ul>
+        </section>
+
+        <hr>
+
+        <section class="section note">
+          <h2>📝 Note for My Love</h2>
+          <div class="note-box">
+            <p>
+              Clear your schedule and just be mine for the day.
+              I’ll make sure you laugh, look pretty in every photo,
+              and go home smiling. ❤️
+            </p>
           </div>
-          <div class="color-item">
-            <span class="color-box" style="background:#800000"></span>
-            <p>Maroon</p>
-          </div>
-        </div>
+        </section>
       </div>
 
-      <hr>
-
-      <!-- 3. What We Do Section -->
-      <div class="section activities">
-        <h2>🎉 What We’ll Do</h2>
-        <ul>
-          <li>🍽 Enjoy unlimited buffet at <strong>The Pearl</strong></li>
-          <li>📸 Take as many pictures as we can for the memories</li>
-          <li>🎮 Play fun games together</li>
-          <li>🎬 Movie Time!!!</li>
-        </ul>
+      <div class="final-message-container">
+        <p class="final-message" id="finalMessage">
+          Can’t wait to see you <span id="textHeart">❤️</span>
+        </p>
+        <span class="floating">💖</span>
+        <span class="floating">✨</span>
+        <span class="floating">💕</span>
+        <span class="floating">🌟</span>
       </div>
-
-      <hr>
-
-      <!-- 4. Note Section -->
-      <div class="section note">
-        <h2>📝 Note for My Love</h2>
-        <div class="note-box">
-          <p>Clear your schedule and just be mine for the day.  
-          I’ll make sure you laugh, look pretty in every photo,  
-          and go home smiling. ❤️</p>
-        </div>
-      </div>
-
-    </div>
-
-    <div class="final-message-container">
-      <p class="final-message" id="finalMessage">
-        Can’t wait to see you <span id="textHeart">❤️</span>
-      </p>
-
-      <!-- Floating emoji around the message -->
-      <span class="floating">💖</span>
-      <span class="floating">✨</span>
-      <span class="floating">💕</span>
-      <span class="floating">🌟</span>
-    </div>
-  </div>
+    </section>
+  </main>
 
   <!-- Effects -->
-  <div id="heartBurst"></div>
-  <canvas id="confetti"></canvas>
-  <div id="popIcons"></div>
-  <div id="cursorHearts"></div>
-  <canvas id="particles"></canvas>
+  <div id="heartBurst" aria-hidden="true"></div>
+  <canvas id="confetti" aria-hidden="true"></canvas>
+  <div id="popIcons" aria-hidden="true"></div>
+  <div id="cursorHearts" aria-hidden="true"></div>
+  <canvas id="particles" aria-hidden="true"></canvas>
 
   <!-- Music -->
-  <audio id="bgMusic" loop>
+  <audio id="bgMusic" loop preload="auto">
     <source src="romantic.mp3" type="audio/mpeg">
   </audio>
-  <audio id="popSound">
+  <audio id="popSound" preload="auto">
     <source src="https://actions.google.com/sounds/v1/cartoon/pop.ogg" type="audio/ogg">
   </audio>
 
