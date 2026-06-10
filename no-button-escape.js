@@ -1,14 +1,8 @@
-// Stable No button movement: no disappearing, stays near original area
+// Safe No button movement: relative only, never fixed, never disappears
 (function () {
   const state = {
-    baseX: 0,
-    baseY: 0,
     x: 0,
     y: 0,
-    targetX: 0,
-    targetY: 0,
-    raf: null,
-    active: false,
     lastMove: 0
   };
 
@@ -22,128 +16,83 @@
     }
   }
 
-  function resetButton(btn) {
+  function trail(btn) {
+    const rect = btn.getBoundingClientRect();
+    const span = document.createElement("span");
+    span.className = "no-trail";
+    span.textContent = Math.random() > 0.5 ? "✨" : "🪶";
+    span.style.left = `${rect.left + rect.width / 2}px`;
+    span.style.top = `${rect.top + rect.height / 2}px`;
+    document.body.appendChild(span);
+    setTimeout(() => span.remove(), 650);
+  }
+
+  function keepInsideScreen(btn, nextX, nextY) {
+    const oldTransform = btn.style.transform;
+    btn.style.transform = `translate3d(${nextX}px, ${nextY}px, 0)`;
+    const rect = btn.getBoundingClientRect();
+
+    const pad = 18;
+    if (rect.left < pad || rect.right > window.innerWidth - pad) {
+      nextX = state.x * -0.45;
+    }
+
+    if (rect.top < 86 || rect.bottom > window.innerHeight - pad) {
+      nextY = state.y * -0.45;
+    }
+
+    btn.style.transform = oldTransform;
+    return { x: nextX, y: nextY };
+  }
+
+  window.moveNoButton = function (btn, event) {
+    const now = Date.now();
+    if (now - state.lastMove < 220) return;
+    state.lastMove = now;
+
     setLabel(btn);
     btn.style.position = "relative";
     btn.style.left = "";
     btn.style.top = "";
     btn.style.margin = "";
-    btn.style.zIndex = "";
-    btn.style.transform = "translate3d(0px, 0px, 0px)";
-    btn.style.willChange = "transform";
-    btn.classList.remove("is-flying", "shake");
-    state.active = false;
-    if (state.raf) cancelAnimationFrame(state.raf);
-    state.raf = null;
-  }
-
-  function activate(btn) {
-    if (state.active) return;
-
-    setLabel(btn);
-    const rect = btn.getBoundingClientRect();
-    state.baseX = rect.left;
-    state.baseY = rect.top;
-    state.x = rect.left;
-    state.y = rect.top;
-    state.targetX = rect.left;
-    state.targetY = rect.top;
-
-    btn.style.position = "fixed";
-    btn.style.left = "0px";
-    btn.style.top = "0px";
-    btn.style.margin = "0";
     btn.style.zIndex = "9999";
-    btn.style.transform = `translate3d(${state.x}px, ${state.y}px, 0)`;
     btn.style.willChange = "transform";
-    btn.style.transition = "box-shadow 0.18s ease, filter 0.18s ease";
-    state.active = true;
-  }
+    btn.style.transition = "transform 0.42s cubic-bezier(.2,.85,.2,1), box-shadow .18s ease, filter .18s ease";
 
-  function visibleBounds(btn) {
     const rect = btn.getBoundingClientRect();
-    const pad = 28;
-    const topPad = 80;
-    return {
-      minX: pad,
-      maxX: Math.max(pad, window.innerWidth - rect.width - pad),
-      minY: topPad,
-      maxY: Math.max(topPad, window.innerHeight - rect.height - pad)
-    };
-  }
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const pointerX = event?.clientX ?? centerX;
+    const pointerY = event?.clientY ?? centerY;
 
-  function chooseTarget(btn, pointerX, pointerY) {
-    const b = visibleBounds(btn);
-    const distance = 135;
-    const options = [
-      { x: state.baseX - distance, y: state.baseY },
-      { x: state.baseX + distance, y: state.baseY },
-      { x: state.baseX, y: state.baseY - 95 },
-      { x: state.baseX, y: state.baseY + 95 },
-      { x: state.baseX - 95, y: state.baseY + 75 },
-      { x: state.baseX + 95, y: state.baseY + 75 }
-    ].map(p => ({
-      x: clamp(p.x, b.minX, b.maxX),
-      y: clamp(p.y, b.minY, b.maxY)
-    }));
+    let dirX = centerX - pointerX;
+    let dirY = centerY - pointerY;
 
-    options.sort((a, bPoint) => {
-      const da = Math.hypot(a.x - pointerX, a.y - pointerY);
-      const db = Math.hypot(bPoint.x - pointerX, bPoint.y - pointerY);
-      return db - da;
-    });
-
-    state.targetX = options[0].x;
-    state.targetY = options[0].y;
-  }
-
-  function animate(btn) {
-    const speed = 0.12;
-    state.x += (state.targetX - state.x) * speed;
-    state.y += (state.targetY - state.y) * speed;
-
-    const b = visibleBounds(btn);
-    state.x = clamp(state.x, b.minX, b.maxX);
-    state.y = clamp(state.y, b.minY, b.maxY);
-    btn.style.transform = `translate3d(${state.x}px, ${state.y}px, 0)`;
-
-    if (Math.abs(state.targetX - state.x) > 0.6 || Math.abs(state.targetY - state.y) > 0.6) {
-      state.raf = requestAnimationFrame(() => animate(btn));
-    } else {
-      state.x = state.targetX;
-      state.y = state.targetY;
-      btn.style.transform = `translate3d(${state.x}px, ${state.y}px, 0)`;
-      btn.classList.remove("is-flying");
-      state.raf = null;
+    if (Math.abs(dirX) < 8 && Math.abs(dirY) < 8) {
+      dirX = Math.random() > 0.5 ? 1 : -1;
+      dirY = Math.random() > 0.5 ? 0.6 : -0.6;
     }
-  }
 
-  function trail(x, y) {
-    const span = document.createElement("span");
-    span.className = "no-trail";
-    span.textContent = Math.random() > 0.5 ? "✨" : "🪶";
-    span.style.left = `${x}px`;
-    span.style.top = `${y}px`;
-    document.body.appendChild(span);
-    setTimeout(() => span.remove(), 650);
-  }
+    const length = Math.hypot(dirX, dirY) || 1;
+    dirX /= length;
+    dirY /= length;
 
-  window.moveNoButton = function (btn, event) {
-    const now = Date.now();
-    if (now - state.lastMove < 500 && state.raf) return;
-    state.lastMove = now;
+    let nextX = state.x + dirX * 118;
+    let nextY = state.y + dirY * 82;
 
-    activate(btn);
-    const rect = btn.getBoundingClientRect();
-    const pointerX = event?.clientX ?? rect.left;
-    const pointerY = event?.clientY ?? rect.top;
+    nextX = clamp(nextX, -190, 190);
+    nextY = clamp(nextY, -120, 120);
 
-    chooseTarget(btn, pointerX, pointerY);
+    const safe = keepInsideScreen(btn, nextX, nextY);
+    state.x = clamp(safe.x, -190, 190);
+    state.y = clamp(safe.y, -120, 120);
+
     btn.classList.add("is-flying", "shake");
-    setTimeout(() => btn.classList.remove("shake"), 180);
-    trail(rect.left + rect.width / 2, rect.top + rect.height / 2);
+    btn.style.transform = `translate3d(${state.x}px, ${state.y}px, 0)`;
+    trail(btn);
 
-    if (!state.raf) state.raf = requestAnimationFrame(() => animate(btn));
+    setTimeout(() => btn.classList.remove("shake"), 180);
+    setTimeout(() => btn.classList.remove("is-flying"), 520);
   };
 
   document.addEventListener("pointermove", function (event) {
@@ -157,16 +106,14 @@
       event.clientY - (rect.top + rect.height / 2)
     );
 
-    if (distance < 70) window.moveNoButton(btn, event);
-  });
-
-  window.addEventListener("resize", function () {
-    const btn = document.querySelector(".no-btn");
-    if (btn) resetButton(btn);
+    if (distance < 68) window.moveNoButton(btn, event);
   });
 
   document.addEventListener("DOMContentLoaded", function () {
     const btn = document.querySelector(".no-btn");
-    if (btn) resetButton(btn);
+    if (!btn) return;
+    setLabel(btn);
+    btn.style.position = "relative";
+    btn.style.transform = "translate3d(0, 0, 0)";
   });
 })();
