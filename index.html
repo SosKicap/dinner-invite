@@ -5,8 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Birthday Dinner Invitation ❤️</title>
   <link rel="stylesheet" href="royalty-fairytale.css?v=1">
+  <link rel="stylesheet" href="no-button-fix.css?v=1">
+  <link rel="stylesheet" href="royal-3d.css?v=1">
 </head>
 <body>
+  <div class="scene-3d" aria-hidden="true">
+    <div class="magic-ring"></div>
+    <div class="orb-3d one"></div>
+    <div class="orb-3d two"></div>
+    <div class="orb-3d three"></div>
+    <div class="castle-3d">🏰</div>
+  </div>
+
   <main>
     <!-- Page 1: Envelope -->
     <section class="page" id="page1" aria-label="Invitation envelope">
@@ -30,7 +40,7 @@
 
         <div class="buttons">
           <button class="yes-btn" type="button" onclick="yesClicked(this)">Yes 💕</button>
-          <button class="no-btn" type="button" onmouseover="moveNoButton(this)" onclick="moveNoButton(this)">No 😢</button>
+          <button class="no-btn" type="button" onmouseover="moveNoButton(this, event)" onclick="moveNoButton(this, event)">No 😢</button>
         </div>
       </div>
     </section>
@@ -74,22 +84,10 @@
 
           <h3>🎨 Theme Colors:</h3>
           <div class="color-code">
-            <div class="color-item">
-              <span class="color-box" style="background:#ffffff"></span>
-              <p>White</p>
-            </div>
-            <div class="color-item">
-              <span class="color-box" style="background:#f5f5dc"></span>
-              <p>Beige</p>
-            </div>
-            <div class="color-item">
-              <span class="color-box" style="background:#c3b091"></span>
-              <p>Khaki</p>
-            </div>
-            <div class="color-item">
-              <span class="color-box" style="background:#800000"></span>
-              <p>Maroon</p>
-            </div>
+            <div class="color-item"><span class="color-box" style="background:#ffffff"></span><p>White</p></div>
+            <div class="color-item"><span class="color-box" style="background:#f5f5dc"></span><p>Beige</p></div>
+            <div class="color-item"><span class="color-box" style="background:#c3b091"></span><p>Khaki</p></div>
+            <div class="color-item"><span class="color-box" style="background:#800000"></span><p>Maroon</p></div>
           </div>
         </section>
 
@@ -147,5 +145,6 @@
   </audio>
 
   <script src="script.js"></script>
+  <script src="no-button-escape.js?v=2"></script>
 </body>
 </html>
