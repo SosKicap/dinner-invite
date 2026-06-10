@@ -1,7 +1,6 @@
-// Stable No button movement with CSS wings
+// Stable No button movement: no disappearing, stays near original area
 (function () {
   const state = {
-    active: false,
     baseX: 0,
     baseY: 0,
     x: 0,
@@ -9,6 +8,7 @@
     targetX: 0,
     targetY: 0,
     raf: null,
+    active: false,
     lastMove: 0
   };
 
@@ -22,14 +22,14 @@
     }
   }
 
-  function resetToNormal(btn) {
+  function resetButton(btn) {
     setLabel(btn);
     btn.style.position = "relative";
     btn.style.left = "";
     btn.style.top = "";
     btn.style.margin = "";
     btn.style.zIndex = "";
-    btn.style.transform = "translate3d(0, 0, 0)";
+    btn.style.transform = "translate3d(0px, 0px, 0px)";
     btn.style.willChange = "transform";
     btn.classList.remove("is-flying", "shake");
     state.active = false;
@@ -54,76 +54,60 @@
     btn.style.top = "0px";
     btn.style.margin = "0";
     btn.style.zIndex = "9999";
+    btn.style.transform = `translate3d(${state.x}px, ${state.y}px, 0)`;
     btn.style.willChange = "transform";
     btn.style.transition = "box-shadow 0.18s ease, filter 0.18s ease";
-    btn.style.transform = `translate3d(${state.x}px, ${state.y}px, 0)`;
     state.active = true;
   }
 
-  function bounds(btn) {
+  function visibleBounds(btn) {
     const rect = btn.getBoundingClientRect();
-    const pad = 34;
-    const top = 86;
+    const pad = 28;
+    const topPad = 80;
     return {
-      rect,
       minX: pad,
       maxX: Math.max(pad, window.innerWidth - rect.width - pad),
-      minY: top,
-      maxY: Math.max(top, window.innerHeight - rect.height - pad)
+      minY: topPad,
+      maxY: Math.max(topPad, window.innerHeight - rect.height - pad)
     };
   }
 
   function chooseTarget(btn, pointerX, pointerY) {
-    const b = bounds(btn);
-    const card = document.querySelector("#page2 .card");
-    const cardRect = card?.getBoundingClientRect();
-
-    let candidates;
-    if (cardRect) {
-      const gap = 28;
-      candidates = [
-        { x: cardRect.left - b.rect.width - gap, y: state.baseY },
-        { x: cardRect.right + gap, y: state.baseY },
-        { x: state.baseX, y: cardRect.top - b.rect.height - gap },
-        { x: state.baseX, y: cardRect.bottom + gap },
-        { x: cardRect.left + 24, y: cardRect.bottom + gap },
-        { x: cardRect.right - b.rect.width - 24, y: cardRect.bottom + gap }
-      ];
-    } else {
-      candidates = [
-        { x: state.baseX - 180, y: state.baseY },
-        { x: state.baseX + 180, y: state.baseY },
-        { x: state.baseX, y: state.baseY - 120 },
-        { x: state.baseX, y: state.baseY + 120 }
-      ];
-    }
-
-    candidates = candidates.map(p => ({
+    const b = visibleBounds(btn);
+    const distance = 135;
+    const options = [
+      { x: state.baseX - distance, y: state.baseY },
+      { x: state.baseX + distance, y: state.baseY },
+      { x: state.baseX, y: state.baseY - 95 },
+      { x: state.baseX, y: state.baseY + 95 },
+      { x: state.baseX - 95, y: state.baseY + 75 },
+      { x: state.baseX + 95, y: state.baseY + 75 }
+    ].map(p => ({
       x: clamp(p.x, b.minX, b.maxX),
       y: clamp(p.y, b.minY, b.maxY)
     }));
 
-    candidates.sort((a, bPoint) => {
+    options.sort((a, bPoint) => {
       const da = Math.hypot(a.x - pointerX, a.y - pointerY);
       const db = Math.hypot(bPoint.x - pointerX, bPoint.y - pointerY);
       return db - da;
     });
 
-    state.targetX = candidates[0].x;
-    state.targetY = candidates[0].y;
+    state.targetX = options[0].x;
+    state.targetY = options[0].y;
   }
 
   function animate(btn) {
-    const speed = 0.11;
+    const speed = 0.12;
     state.x += (state.targetX - state.x) * speed;
     state.y += (state.targetY - state.y) * speed;
 
-    const b = bounds(btn);
+    const b = visibleBounds(btn);
     state.x = clamp(state.x, b.minX, b.maxX);
     state.y = clamp(state.y, b.minY, b.maxY);
     btn.style.transform = `translate3d(${state.x}px, ${state.y}px, 0)`;
 
-    if (Math.abs(state.targetX - state.x) > 0.7 || Math.abs(state.targetY - state.y) > 0.7) {
+    if (Math.abs(state.targetX - state.x) > 0.6 || Math.abs(state.targetY - state.y) > 0.6) {
       state.raf = requestAnimationFrame(() => animate(btn));
     } else {
       state.x = state.targetX;
@@ -146,11 +130,10 @@
 
   window.moveNoButton = function (btn, event) {
     const now = Date.now();
-    if (now - state.lastMove < 450 && state.raf) return;
+    if (now - state.lastMove < 500 && state.raf) return;
     state.lastMove = now;
 
     activate(btn);
-
     const rect = btn.getBoundingClientRect();
     const pointerX = event?.clientX ?? rect.left;
     const pointerY = event?.clientY ?? rect.top;
@@ -163,7 +146,7 @@
     if (!state.raf) state.raf = requestAnimationFrame(() => animate(btn));
   };
 
-  document.addEventListener("pointermove", (event) => {
+  document.addEventListener("pointermove", function (event) {
     const btn = document.querySelector(".no-btn");
     const page2 = document.getElementById("page2");
     if (!btn || page2?.classList.contains("hidden")) return;
@@ -174,16 +157,16 @@
       event.clientY - (rect.top + rect.height / 2)
     );
 
-    if (distance < 72) window.moveNoButton(btn, event);
+    if (distance < 70) window.moveNoButton(btn, event);
   });
 
-  window.addEventListener("resize", () => {
+  window.addEventListener("resize", function () {
     const btn = document.querySelector(".no-btn");
-    if (btn) resetToNormal(btn);
+    if (btn) resetButton(btn);
   });
 
-  document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("DOMContentLoaded", function () {
     const btn = document.querySelector(".no-btn");
-    if (btn) resetToNormal(btn);
+    if (btn) resetButton(btn);
   });
 })();
