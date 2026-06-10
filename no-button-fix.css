@@ -1,0 +1,14 @@
+/* Let the No button escape outside the invitation card */
+.card.glass {
+  overflow: visible !important;
+}
+
+.buttons {
+  position: relative;
+  z-index: 20;
+}
+
+.no-btn {
+  z-index: 50;
+  will-change: transform;
+}
