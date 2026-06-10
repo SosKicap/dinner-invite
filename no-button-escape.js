@@ -14,6 +14,15 @@
     return Math.max(min, Math.min(max, value));
   }
 
+  function getBounds(btn) {
+    const rect = btn.getBoundingClientRect();
+    const padding = 26;
+    const safeTop = 92;
+    const maxX = Math.max(padding, window.innerWidth - rect.width - padding);
+    const maxY = Math.max(safeTop, window.innerHeight - rect.height - padding);
+    return { rect, padding, safeTop, maxX, maxY };
+  }
+
   function setupButton(btn) {
     if (state.ready) return;
 
@@ -37,14 +46,18 @@
   }
 
   function animate(btn) {
-    state.x += (state.targetX - state.x) * 0.42;
-    state.y += (state.targetY - state.y) * 0.42;
+    state.x += (state.targetX - state.x) * 0.48;
+    state.y += (state.targetY - state.y) * 0.48;
+
+    const { padding, safeTop, maxX, maxY } = getBounds(btn);
+    state.x = clamp(state.x, padding, maxX);
+    state.y = clamp(state.y, safeTop, maxY);
 
     btn.style.transform = `translate3d(${state.x}px, ${state.y}px, 0)`;
 
     const dx = Math.abs(state.targetX - state.x);
     const dy = Math.abs(state.targetY - state.y);
-    if (dx > 0.4 || dy > 0.4) {
+    if (dx > 0.35 || dy > 0.35) {
       state.raf = requestAnimationFrame(() => animate(btn));
     } else {
       state.x = state.targetX;
@@ -55,39 +68,41 @@
     }
   }
 
-  function pickTarget(btn, pointerX, pointerY) {
+  function isInsideCard(x, y, btn, cardRect) {
+    if (!cardRect) return false;
     const rect = btn.getBoundingClientRect();
-    const padding = 28;
-    const safeTop = 96;
-    const maxX = window.innerWidth - rect.width - padding;
-    const maxY = window.innerHeight - rect.height - padding;
+    return (
+      x > cardRect.left - 18 &&
+      x < cardRect.right - rect.width + 18 &&
+      y > cardRect.top - 18 &&
+      y < cardRect.bottom - rect.height + 18
+    );
+  }
 
+  function pickTarget(btn, pointerX, pointerY) {
+    const { padding, safeTop, maxX, maxY } = getBounds(btn);
     const card = document.querySelector("#page2 .card");
     const cardRect = card?.getBoundingClientRect();
 
-    let x;
-    let y;
+    const outsideZones = [
+      () => ({ x: padding + Math.random() * Math.max(40, window.innerWidth * 0.22), y: safeTop + Math.random() * Math.max(40, window.innerHeight - safeTop - 90) }),
+      () => ({ x: window.innerWidth * 0.73 + Math.random() * Math.max(40, window.innerWidth * 0.2), y: safeTop + Math.random() * Math.max(40, window.innerHeight - safeTop - 90) }),
+      () => ({ x: padding + Math.random() * Math.max(40, window.innerWidth - 160), y: safeTop + Math.random() * 130 }),
+      () => ({ x: padding + Math.random() * Math.max(40, window.innerWidth - 160), y: window.innerHeight * 0.72 + Math.random() * Math.max(30, window.innerHeight * 0.18) })
+    ];
+
+    let x = state.x;
+    let y = state.y;
     let tries = 0;
 
     do {
-      const moveDistance = 260 + Math.random() * 260;
-      const angle = Math.random() * Math.PI * 2;
-      const baseX = pointerX ?? state.x;
-      const baseY = pointerY ?? state.y;
-
-      x = baseX + Math.cos(angle) * moveDistance;
-      y = baseY + Math.sin(angle) * moveDistance;
-
-      x = clamp(x, padding, maxX);
-      y = clamp(y, safeTop, maxY);
+      const zone = outsideZones[Math.floor(Math.random() * outsideZones.length)]();
+      x = clamp(zone.x, padding, maxX);
+      y = clamp(zone.y, safeTop, maxY);
       tries++;
     } while (
-      cardRect &&
-      x > cardRect.left + 20 &&
-      x < cardRect.right - rect.width - 20 &&
-      y > cardRect.top + 20 &&
-      y < cardRect.bottom - rect.height - 20 &&
-      tries < 14
+      (isInsideCard(x, y, btn, cardRect) || Math.hypot(x - pointerX, y - pointerY) < 180) &&
+      tries < 24
     );
 
     state.targetX = clamp(x, padding, maxX);
@@ -97,7 +112,7 @@
   function makeTrail(x, y) {
     const sparkle = document.createElement("span");
     sparkle.className = "no-trail";
-    sparkle.textContent = Math.random() > 0.5 ? "✨" : "🪶";
+    sparkle.textContent = Math.random() > 0.45 ? "✨" : "🪶";
     sparkle.style.left = `${x}px`;
     sparkle.style.top = `${y}px`;
     document.body.appendChild(sparkle);
@@ -126,15 +141,15 @@
 
   document.addEventListener("pointermove", (event) => {
     const btn = document.querySelector(".no-btn");
-    if (!btn) return;
+    const page2 = document.getElementById("page2");
+    if (!btn || page2?.classList.contains("hidden")) return;
 
     const rect = btn.getBoundingClientRect();
-    const distance = Math.hypot(
-      event.clientX - (rect.left + rect.width / 2),
-      event.clientY - (rect.top + rect.height / 2)
-    );
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const distance = Math.hypot(event.clientX - centerX, event.clientY - centerY);
 
-    if (distance < 86) {
+    if (distance < 90) {
       window.moveNoButton(btn, event);
     }
   });
@@ -143,9 +158,9 @@
     const btn = document.querySelector(".no-btn");
     if (!btn || !state.ready) return;
 
-    const rect = btn.getBoundingClientRect();
-    state.targetX = clamp(state.targetX, 28, window.innerWidth - rect.width - 28);
-    state.targetY = clamp(state.targetY, 96, window.innerHeight - rect.height - 28);
+    const { padding, safeTop, maxX, maxY } = getBounds(btn);
+    state.targetX = clamp(state.targetX, padding, maxX);
+    state.targetY = clamp(state.targetY, safeTop, maxY);
     if (!state.raf) state.raf = requestAnimationFrame(() => animate(btn));
   });
 })();
