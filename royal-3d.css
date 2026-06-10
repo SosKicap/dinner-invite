@@ -1,0 +1,206 @@
+/* 3D Royal Animation Layer */
+:root {
+  --tilt-x: 0deg;
+  --tilt-y: 0deg;
+}
+
+body {
+  perspective: 1200px;
+}
+
+.scene-3d {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+  transform-style: preserve-3d;
+}
+
+.orb-3d {
+  position: absolute;
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(255, 247, 214, 0.95), rgba(247, 200, 95, 0.28) 42%, rgba(95, 27, 116, 0.04) 70%);
+  box-shadow: 0 0 32px rgba(247, 200, 95, 0.4), inset -18px -24px 42px rgba(95, 27, 116, 0.22);
+  opacity: 0.28;
+  animation: orbFloat 9s ease-in-out infinite;
+}
+
+.orb-3d.one {
+  left: 8%;
+  top: 18%;
+  transform: translateZ(-120px);
+}
+
+.orb-3d.two {
+  right: 9%;
+  top: 12%;
+  width: 92px;
+  height: 92px;
+  animation-delay: -3s;
+  transform: translateZ(-60px);
+}
+
+.orb-3d.three {
+  left: 14%;
+  bottom: 12%;
+  width: 76px;
+  height: 76px;
+  animation-delay: -5s;
+  transform: translateZ(-90px);
+}
+
+@keyframes orbFloat {
+  0%, 100% { transform: translate3d(0, 0, -90px) rotateX(0deg) rotateY(0deg); }
+  50% { transform: translate3d(22px, -28px, 90px) rotateX(18deg) rotateY(-24deg); }
+}
+
+.castle-3d {
+  position: absolute;
+  right: clamp(12px, 5vw, 80px);
+  bottom: clamp(12px, 4vw, 70px);
+  font-size: clamp(5rem, 15vw, 12rem);
+  opacity: 0.16;
+  filter: drop-shadow(0 0 30px rgba(247, 200, 95, 0.35));
+  animation: castleDepth 8s ease-in-out infinite;
+  transform-style: preserve-3d;
+}
+
+@keyframes castleDepth {
+  0%, 100% { transform: translate3d(0, 0, -100px) rotateY(-8deg); }
+  50% { transform: translate3d(-18px, -12px, 20px) rotateY(8deg); }
+}
+
+.envelope {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.envelope:not(.open):not(.zoom) {
+  animation: royalEnvelope3D 4s ease-in-out infinite alternate;
+}
+
+@keyframes royalEnvelope3D {
+  0% { transform: rotateX(0deg) rotateY(-7deg) translateY(0); }
+  50% { transform: rotateX(8deg) rotateY(7deg) translateY(-8px); }
+  100% { transform: rotateX(-4deg) rotateY(0deg) translateY(-4px); }
+}
+
+.flap.top {
+  transform-style: preserve-3d;
+  backface-visibility: visible;
+}
+
+.card.glass {
+  transform-style: preserve-3d;
+  will-change: transform;
+  transform: rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
+  transition: transform 0.18s ease, box-shadow 0.3s ease;
+}
+
+.card.glass:hover {
+  box-shadow:
+    0 36px 96px rgba(0, 0, 0, 0.38),
+    0 0 64px rgba(247, 200, 95, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.86);
+}
+
+.card.glass::before,
+.card.glass::after {
+  transform: translateZ(38px);
+}
+
+.card.glass h1,
+.card.glass h2,
+.card.glass p,
+.card.glass .buttons,
+.card.glass .section,
+.card.glass .dress-images,
+.card.glass .color-code,
+.card.glass .note-box {
+  transform: translateZ(28px);
+}
+
+.yes-btn,
+.no-btn,
+.btn-location {
+  transform-style: preserve-3d;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
+}
+
+.yes-btn:hover,
+.btn-location:hover {
+  transform: translateY(-4px) translateZ(24px) scale(1.04);
+}
+
+.no-btn:hover {
+  transform: translateZ(24px) scale(1.04);
+}
+
+.dress-images img,
+.color-item,
+.activities li,
+.note-box {
+  transform-style: preserve-3d;
+  transition: transform 0.32s ease, box-shadow 0.32s ease;
+}
+
+.dress-images img:hover,
+.color-item:hover,
+.activities li:hover {
+  transform: translateY(-7px) rotateX(6deg) rotateY(-6deg) translateZ(18px);
+}
+
+.magic-ring {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  width: 240px;
+  height: 240px;
+  border: 2px solid rgba(247, 200, 95, 0.42);
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%) rotateX(70deg) rotateZ(0deg);
+  box-shadow: 0 0 28px rgba(247, 200, 95, 0.28), inset 0 0 28px rgba(215, 184, 255, 0.18);
+  opacity: 0.24;
+  z-index: 0;
+  animation: ringSpin 12s linear infinite;
+}
+
+.magic-ring::before,
+.magic-ring::after {
+  content: "";
+  position: absolute;
+  inset: 22px;
+  border-radius: 50%;
+  border: 1px dashed rgba(255, 247, 214, 0.38);
+}
+
+.magic-ring::after {
+  inset: 44px;
+  border-style: solid;
+  opacity: 0.5;
+}
+
+@keyframes ringSpin {
+  from { transform: translate(-50%, -50%) rotateX(70deg) rotateZ(0deg); }
+  to { transform: translate(-50%, -50%) rotateX(70deg) rotateZ(360deg); }
+}
+
+@media (max-width: 600px) {
+  .orb-3d {
+    opacity: 0.2;
+  }
+
+  .magic-ring {
+    width: 180px;
+    height: 180px;
+    opacity: 0.18;
+  }
+
+  .card.glass {
+    transform: none !important;
+  }
+}
