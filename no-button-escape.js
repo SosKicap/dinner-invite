@@ -45,6 +45,20 @@
     state.ready = true;
   }
 
+  function resetButtonToStart(btn) {
+    btn.innerHTML = '<span class="wing left">🪽</span><span class="no-label">No 😭</span><span class="wing right">🪽</span>';
+    btn.style.position = "relative";
+    btn.style.left = "";
+    btn.style.top = "";
+    btn.style.margin = "";
+    btn.style.zIndex = "";
+    btn.style.transform = "";
+    btn.style.willChange = "transform";
+    btn.classList.remove("is-flying", "shake");
+    state.ready = false;
+    state.raf = null;
+  }
+
   function animate(btn) {
     state.x += (state.targetX - state.x) * 0.48;
     state.y += (state.targetY - state.y) * 0.48;
@@ -156,11 +170,21 @@
 
   window.addEventListener("resize", () => {
     const btn = document.querySelector(".no-btn");
-    if (!btn || !state.ready) return;
+    if (!btn) return;
+
+    if (!state.ready) {
+      resetButtonToStart(btn);
+      return;
+    }
 
     const { padding, safeTop, maxX, maxY } = getBounds(btn);
     state.targetX = clamp(state.targetX, padding, maxX);
     state.targetY = clamp(state.targetY, safeTop, maxY);
     if (!state.raf) state.raf = requestAnimationFrame(() => animate(btn));
+  });
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const btn = document.querySelector(".no-btn");
+    if (btn) resetButtonToStart(btn);
   });
 })();
