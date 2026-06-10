@@ -1,26 +1,9 @@
-// Slow but sharp No button escape override
+// Slow, visible No button escape override
 (function () {
-  const state = {
-    x: 0,
-    y: 0,
-    targetX: 0,
-    targetY: 0,
-    raf: null,
-    ready: false,
-    flightCount: 0
-  };
+  const state = { x: 0, y: 0, targetX: 0, targetY: 0, raf: null, ready: false };
 
   function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
-  }
-
-  function getBounds(btn) {
-    const rect = btn.getBoundingClientRect();
-    const padding = 26;
-    const safeTop = 92;
-    const maxX = Math.max(padding, window.innerWidth - rect.width - padding);
-    const maxY = Math.max(safeTop, window.innerHeight - rect.height - padding);
-    return { rect, padding, safeTop, maxX, maxY };
   }
 
   function setupButton(btn) {
@@ -41,7 +24,6 @@
     btn.style.transform = `translate3d(${state.x}px, ${state.y}px, 0)`;
     btn.style.transition = "box-shadow 0.14s ease, filter 0.14s ease";
     btn.style.willChange = "transform";
-
     state.ready = true;
   }
 
@@ -56,71 +38,83 @@
     btn.style.willChange = "transform";
     btn.classList.remove("is-flying", "shake");
     state.ready = false;
+    if (state.raf) cancelAnimationFrame(state.raf);
     state.raf = null;
   }
 
-  function animate(btn) {
-    state.x += (state.targetX - state.x) * 0.16;
-    state.y += (state.targetY - state.y) * 0.16;
+  function getBounds(btn) {
+    const rect = btn.getBoundingClientRect();
+    const padding = 30;
+    const safeTop = 96;
+    return {
+      rect,
+      minX: padding,
+      maxX: window.innerWidth - rect.width - padding,
+      minY: safeTop,
+      maxY: window.innerHeight - rect.height - padding
+    };
+  }
 
-    const { padding, safeTop, maxX, maxY } = getBounds(btn);
-    state.x = clamp(state.x, padding, maxX);
-    state.y = clamp(state.y, safeTop, maxY);
+  function animate(btn) {
+    state.x += (state.targetX - state.x) * 0.13;
+    state.y += (state.targetY - state.y) * 0.13;
+
+    const bounds = getBounds(btn);
+    state.x = clamp(state.x, bounds.minX, bounds.maxX);
+    state.y = clamp(state.y, bounds.minY, bounds.maxY);
 
     btn.style.transform = `translate3d(${state.x}px, ${state.y}px, 0)`;
 
-    const dx = Math.abs(state.targetX - state.x);
-    const dy = Math.abs(state.targetY - state.y);
-    if (dx > 0.35 || dy > 0.35) {
+    if (Math.abs(state.targetX - state.x) > 0.5 || Math.abs(state.targetY - state.y) > 0.5) {
       state.raf = requestAnimationFrame(() => animate(btn));
     } else {
       state.x = state.targetX;
       state.y = state.targetY;
       btn.style.transform = `translate3d(${state.x}px, ${state.y}px, 0)`;
-      state.raf = null;
       btn.classList.remove("is-flying");
+      state.raf = null;
     }
   }
 
-  function isInsideCard(x, y, btn, cardRect) {
-    if (!cardRect) return false;
-    const rect = btn.getBoundingClientRect();
-    return (
-      x > cardRect.left - 18 &&
-      x < cardRect.right - rect.width + 18 &&
-      y > cardRect.top - 18 &&
-      y < cardRect.bottom - rect.height + 18
-    );
-  }
-
-  function pickTarget(btn, pointerX, pointerY) {
-    const { padding, safeTop, maxX, maxY } = getBounds(btn);
+  function chooseTarget(btn, pointerX, pointerY) {
+    const bounds = getBounds(btn);
     const card = document.querySelector("#page2 .card");
     const cardRect = card?.getBoundingClientRect();
+    const rect = bounds.rect;
 
-    const outsideZones = [
-      () => ({ x: padding + Math.random() * Math.max(40, window.innerWidth * 0.22), y: safeTop + Math.random() * Math.max(40, window.innerHeight - safeTop - 90) }),
-      () => ({ x: window.innerWidth * 0.73 + Math.random() * Math.max(40, window.innerWidth * 0.2), y: safeTop + Math.random() * Math.max(40, window.innerHeight - safeTop - 90) }),
-      () => ({ x: padding + Math.random() * Math.max(40, window.innerWidth - 160), y: safeTop + Math.random() * 130 }),
-      () => ({ x: padding + Math.random() * Math.max(40, window.innerWidth - 160), y: window.innerHeight * 0.72 + Math.random() * Math.max(30, window.innerHeight * 0.18) })
-    ];
+    let candidates = [];
+    if (cardRect) {
+      candidates = [
+        { x: cardRect.left - rect.width - 38, y: cardRect.top + cardRect.height * 0.35 },
+        { x: cardRect.right + 38, y: cardRect.top + cardRect.height * 0.38 },
+        { x: cardRect.left + cardRect.width * 0.22, y: cardRect.top - rect.height - 34 },
+        { x: cardRect.left + cardRect.width * 0.68, y: cardRect.bottom + 34 },
+        { x: cardRect.right - rect.width - 20, y: cardRect.bottom + 28 },
+        { x: cardRect.left + 18, y: cardRect.bottom + 28 }
+      ];
+    } else {
+      candidates = [
+        { x: bounds.minX, y: bounds.minY + 120 },
+        { x: bounds.maxX, y: bounds.minY + 120 },
+        { x: bounds.minX + 150, y: bounds.maxY },
+        { x: bounds.maxX - 150, y: bounds.maxY }
+      ];
+    }
 
-    let x = state.x;
-    let y = state.y;
-    let tries = 0;
+    candidates = candidates.map(point => ({
+      x: clamp(point.x, bounds.minX, bounds.maxX),
+      y: clamp(point.y, bounds.minY, bounds.maxY)
+    }));
 
-    do {
-      const zone = outsideZones[Math.floor(Math.random() * outsideZones.length)]();
-      x = clamp(zone.x, padding, maxX);
-      y = clamp(zone.y, safeTop, maxY);
-      tries++;
-    } while (
-      (isInsideCard(x, y, btn, cardRect) || Math.hypot(x - pointerX, y - pointerY) < 180) &&
-      tries < 24
-    );
+    candidates.sort((a, b) => {
+      const da = Math.hypot(a.x - pointerX, a.y - pointerY) + Math.hypot(a.x - state.x, a.y - state.y) * 0.25;
+      const db = Math.hypot(b.x - pointerX, b.y - pointerY) + Math.hypot(b.x - state.x, b.y - state.y) * 0.25;
+      return db - da;
+    });
 
-    state.targetX = clamp(x, padding, maxX);
-    state.targetY = clamp(y, safeTop, maxY);
+    const pick = candidates[0];
+    state.targetX = pick.x;
+    state.targetY = pick.y;
   }
 
   function makeTrail(x, y) {
@@ -135,22 +129,16 @@
 
   window.moveNoButton = function (btn, event) {
     setupButton(btn);
-
     const rect = btn.getBoundingClientRect();
     const pointerX = event?.clientX ?? rect.left;
     const pointerY = event?.clientY ?? rect.top;
 
-    pickTarget(btn, pointerX, pointerY);
-
-    state.flightCount++;
+    chooseTarget(btn, pointerX, pointerY);
     btn.classList.add("is-flying", "shake");
     setTimeout(() => btn.classList.remove("shake"), 180);
-
     makeTrail(rect.left + rect.width / 2, rect.top + rect.height / 2);
 
-    if (!state.raf) {
-      state.raf = requestAnimationFrame(() => animate(btn));
-    }
+    if (!state.raf) state.raf = requestAnimationFrame(() => animate(btn));
   };
 
   document.addEventListener("pointermove", (event) => {
@@ -159,11 +147,12 @@
     if (!btn || page2?.classList.contains("hidden")) return;
 
     const rect = btn.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    const distance = Math.hypot(event.clientX - centerX, event.clientY - centerY);
+    const distance = Math.hypot(
+      event.clientX - (rect.left + rect.width / 2),
+      event.clientY - (rect.top + rect.height / 2)
+    );
 
-    if (distance < 90) {
+    if (distance < 84 && !state.raf) {
       window.moveNoButton(btn, event);
     }
   });
@@ -171,15 +160,10 @@
   window.addEventListener("resize", () => {
     const btn = document.querySelector(".no-btn");
     if (!btn) return;
-
-    if (!state.ready) {
-      resetButtonToStart(btn);
-      return;
-    }
-
-    const { padding, safeTop, maxX, maxY } = getBounds(btn);
-    state.targetX = clamp(state.targetX, padding, maxX);
-    state.targetY = clamp(state.targetY, safeTop, maxY);
+    if (!state.ready) return;
+    const bounds = getBounds(btn);
+    state.targetX = clamp(state.targetX, bounds.minX, bounds.maxX);
+    state.targetY = clamp(state.targetY, bounds.minY, bounds.maxY);
     if (!state.raf) state.raf = requestAnimationFrame(() => animate(btn));
   });
 
