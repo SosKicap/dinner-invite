@@ -1,4 +1,4 @@
-// Sharp but visible No button escape override
+// Slow but sharp No button escape override
 (function () {
   const state = {
     x: 0,
@@ -60,8 +60,8 @@
   }
 
   function animate(btn) {
-    state.x += (state.targetX - state.x) * 0.48;
-    state.y += (state.targetY - state.y) * 0.48;
+    state.x += (state.targetX - state.x) * 0.16;
+    state.y += (state.targetY - state.y) * 0.16;
 
     const { padding, safeTop, maxX, maxY } = getBounds(btn);
     state.x = clamp(state.x, padding, maxX);
