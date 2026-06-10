@@ -1,0 +1,89 @@
+/* Stable No button behaviour + real wings */
+.card.glass {
+  overflow: visible !important;
+}
+
+.buttons {
+  position: relative;
+  z-index: 30;
+}
+
+.no-btn {
+  position: relative;
+  overflow: visible !important;
+  min-width: 132px;
+  z-index: 9999;
+  will-change: transform;
+}
+
+.no-btn .no-label {
+  position: relative;
+  z-index: 2;
+}
+
+.no-btn::before,
+.no-btn::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 34px;
+  height: 28px;
+  background: radial-gradient(circle at 35% 35%, #fff, #f7dcff 45%, #d7b8ff 76%);
+  border: 2px solid rgba(247, 200, 95, 0.72);
+  box-shadow: 0 0 14px rgba(247, 200, 95, 0.28);
+  opacity: 0;
+  pointer-events: none;
+  transform-origin: center right;
+  transition: opacity 0.2s ease;
+  clip-path: polygon(0 50%, 28% 8%, 100% 0, 74% 50%, 100% 100%, 28% 92%);
+}
+
+.no-btn::before {
+  right: calc(100% - 8px);
+  transform: translateY(-50%) rotate(-8deg);
+}
+
+.no-btn::after {
+  left: calc(100% - 8px);
+  transform: translateY(-50%) scaleX(-1) rotate(-8deg);
+}
+
+.no-btn.is-flying::before,
+.no-btn.is-flying::after,
+.no-btn:hover::before,
+.no-btn:hover::after {
+  opacity: 1;
+}
+
+.no-btn.is-flying::before,
+.no-btn:hover::before {
+  animation: leftWingFlap 0.32s ease-in-out infinite;
+}
+
+.no-btn.is-flying::after,
+.no-btn:hover::after {
+  animation: rightWingFlap 0.32s ease-in-out infinite;
+}
+
+@keyframes leftWingFlap {
+  0%, 100% { transform: translateY(-50%) rotate(-18deg) scaleY(0.9); }
+  50% { transform: translateY(-68%) rotate(24deg) scaleY(1.12); }
+}
+
+@keyframes rightWingFlap {
+  0%, 100% { transform: translateY(-50%) scaleX(-1) rotate(-18deg) scaleY(0.9); }
+  50% { transform: translateY(-68%) scaleX(-1) rotate(24deg) scaleY(1.12); }
+}
+
+.no-trail {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9998;
+  font-size: 1.1rem;
+  animation: noTrailFade 0.7s ease forwards;
+}
+
+@keyframes noTrailFade {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to { opacity: 0; transform: translateY(-28px) scale(1.35); }
+}
