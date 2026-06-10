@@ -1,4 +1,4 @@
-// Stable No button movement: start beside Yes, move slightly outside card, stay visible
+// Stable No button movement with CSS wings
 (function () {
   const state = {
     active: false,
@@ -16,14 +16,14 @@
     return Math.max(min, Math.min(max, value));
   }
 
-  function setWingLabel(btn) {
+  function setLabel(btn) {
     if (!btn.querySelector(".no-label")) {
-      btn.innerHTML = '<span class="wing left">🪽</span><span class="no-label">No 😭</span><span class="wing right">🪽</span>';
+      btn.innerHTML = '<span class="no-label">No 😭</span>';
     }
   }
 
   function resetToNormal(btn) {
-    setWingLabel(btn);
+    setLabel(btn);
     btn.style.position = "relative";
     btn.style.left = "";
     btn.style.top = "";
@@ -40,7 +40,7 @@
   function activate(btn) {
     if (state.active) return;
 
-    setWingLabel(btn);
+    setLabel(btn);
     const rect = btn.getBoundingClientRect();
     state.baseX = rect.left;
     state.baseY = rect.top;
@@ -62,7 +62,7 @@
 
   function bounds(btn) {
     const rect = btn.getBoundingClientRect();
-    const pad = 22;
+    const pad = 34;
     const top = 86;
     return {
       rect,
@@ -80,7 +80,7 @@
 
     let candidates;
     if (cardRect) {
-      const gap = 24;
+      const gap = 28;
       candidates = [
         { x: cardRect.left - b.rect.width - gap, y: state.baseY },
         { x: cardRect.right + gap, y: state.baseY },
@@ -109,9 +109,8 @@
       return db - da;
     });
 
-    const target = candidates[0];
-    state.targetX = target.x;
-    state.targetY = target.y;
+    state.targetX = candidates[0].x;
+    state.targetY = candidates[0].y;
   }
 
   function animate(btn) {
